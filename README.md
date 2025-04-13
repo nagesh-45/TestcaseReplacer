@@ -9,21 +9,19 @@ A Java tool that replaces placeholders in Excel files with values from a propert
 - Creates timestamped output files
 - Supports .xlsm (macro-enabled) Excel files
 - Detailed logging of replacements
-- Works on both Windows and macOS
 
 ## Prerequisites
 
 - Java 24 or higher
 - Maven
 
-### Windows Setup
-1. Install Java from: https://www.oracle.com/java/technologies/downloads/
-2. Install Maven from: https://maven.apache.org/download.cgi
-3. Add Java and Maven to your system PATH
+## Setup
 
-### macOS Setup
-1. Install Java using Homebrew: `brew install openjdk`
-2. Install Maven using Homebrew: `brew install maven`
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   mvn clean install
+   ```
 
 ## Configuration
 
@@ -41,15 +39,18 @@ description=Sample project
 
 ## Usage
 
-### Windows
-1. Double-click `run.bat` in the project folder
-   - Or use the shortcut created on your desktop
-2. The program will run and open the output folder when done
+1. Prepare your Excel file:
+   - Use placeholders in the format `{key}` where `key` matches a property name
+   - Example: `Hello {name}, welcome to {company}`
 
-### macOS
-1. Double-click `Run Excel Replacer.command` on your desktop
-   - Or run `./run.sh` from Terminal
-2. The program will run and open the output folder when done
+2. Run the program:
+   ```bash
+   mvn exec:java -Dexec.mainClass="com.example.ExcelReplacer"
+   ```
+
+3. Find the output:
+   - The modified file will be created in the `output` folder
+   - Filename format: `IDPE Onus Tcs_YYYYMMDD_HHMMSS.xlsm`
 
 ## Example
 
@@ -82,5 +83,4 @@ If you encounter issues:
 1. Check that the Excel file is in the correct location
 2. Verify the properties file format
 3. Ensure the Excel file is not open in Excel
-4. Check the console output for error messages
-5. Verify Java and Maven are installed and in your PATH 
+4. Check the console output for error messages 
