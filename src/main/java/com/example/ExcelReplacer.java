@@ -15,20 +15,24 @@ public class ExcelReplacer {
     public static void main(String[] args) {
         // Get the project root directory
         String projectRoot = System.getProperty("user.dir");
-        String propertiesPath = projectRoot + "/src/main/resources/config.properties";
-        String excelFilePath = projectRoot + "/src/main/resources/IDPE Onus Tcs.xlsm";
-        String outputFolderPath = projectRoot + "/output";
+        String propertiesPath = projectRoot + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "config.properties";
+        String excelFilePath = projectRoot + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "IDPE Onus Tcs.xlsm";
+        String outputFolderPath = projectRoot + File.separator + "output";
         
         // Create timestamp for filename
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String timestamp = dateFormat.format(new Date());
-        String outputFilePath = outputFolderPath + "/IDPE Onus Tcs_" + timestamp + ".xlsm";
+        String outputFilePath = outputFolderPath + File.separator + "IDPE Onus Tcs_" + timestamp + ".xlsm";
 
         System.out.println("Starting Excel replacement process...");
         System.out.println("Properties file path: " + propertiesPath);
         System.out.println("Excel file path: " + excelFilePath);
         System.out.println("Output folder path: " + outputFolderPath);
         System.out.println("Output file will be saved as: " + new File(outputFilePath).getName());
+
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+        Workbook workbook = null;
 
         try {
             // Create output folder if it doesn't exist
@@ -50,7 +54,8 @@ public class ExcelReplacer {
                 return;
             }
             System.out.println("Loading properties file...");
-            properties.load(new FileInputStream(propertiesFile));
+            fis = new FileInputStream(propertiesFile);
+            properties.load(fis);
             System.out.println("Properties loaded successfully. Found " + properties.size() + " properties.");
 
             // Load Excel file
@@ -62,10 +67,9 @@ public class ExcelReplacer {
             System.out.println("Loading Excel file...");
             
             // Read the existing Excel file
-            FileInputStream fis = new FileInputStream(excelFile);
-            Workbook workbook = new XSSFWorkbook(fis);
+            fis = new FileInputStream(excelFile);
+            workbook = new XSSFWorkbook(fis);
             System.out.println("Excel file loaded successfully. Number of sheets: " + workbook.getNumberOfSheets());
-            fis.close();
 
             // Process each sheet
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -76,7 +80,7 @@ public class ExcelReplacer {
                 for (Row row : sheet) {
                     // Process each cell
                     for (Cell cell : row) {
-                        if (cell.getCellType() == CellType.STRING) {
+                        if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
                             String cellValue = cell.getStringCellValue();
                             boolean wasModified = false;
                             
@@ -105,22 +109,22 @@ public class ExcelReplacer {
             // Save the modified Excel file to the output folder
             System.out.println("Saving modified Excel file...");
             File outputFile = new File(outputFilePath);
-            try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-                workbook.write(fos);
-                System.out.println("Excel file has been updated successfully at: " + outputFile.getAbsolutePath());
-            } catch (IOException e) {
-                System.err.println("Error writing to file: " + e.getMessage());
-                e.printStackTrace();
-            }
-
-            workbook.close();
-            System.out.println("Process completed successfully!");
+            fos = new FileOutputStream(outputFile);
+            workbook.write(fos);
+            System.out.println("Excel file has been updated successfully at: " + outputFile.getAbsolutePath());
 
         } catch (IOException e) {
             System.err.println("Error processing files: " + e.getMessage());
             e.printStackTrace();
-
-
+        } finally {
+            // Close resources
+            try {
+                if (fis != null) fis.close();
+                if (fos != null) fos.close();
+                if (workbook != null) workbook.close();
+            } catch (IOException e) {
+                System.err.println("Error closing resources: " + e.getMessage());
+            }
         }
     }
 } 
