@@ -16,25 +16,44 @@ public class ExcelReplacer {
         // Get the project root directory
         String projectRoot = System.getProperty("user.dir");
         String propertiesPath = projectRoot + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "config.properties";
-        String excelFilePath = projectRoot + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "IDPE Onus Tcs.xlsm";
         String outputFolderPath = projectRoot + File.separator + "output";
         
-        // Create timestamp for filename
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        String timestamp = dateFormat.format(new Date());
-        String outputFilePath = outputFolderPath + File.separator + "IDPE Onus Tcs_" + timestamp + ".xlsm";
-
-        System.out.println("Starting Excel replacement process...");
-        System.out.println("Properties file path: " + propertiesPath);
-        System.out.println("Excel file path: " + excelFilePath);
-        System.out.println("Output folder path: " + outputFolderPath);
-        System.out.println("Output file will be saved as: " + new File(outputFilePath).getName());
-
         FileInputStream fis = null;
         FileOutputStream fos = null;
         Workbook workbook = null;
 
         try {
+            // Load properties file
+            Properties properties = new Properties();
+            File propertiesFile = new File(propertiesPath);
+            if (!propertiesFile.exists()) {
+                System.err.println("Properties file not found at: " + propertiesPath);
+                return;
+            }
+            System.out.println("Loading properties file...");
+            fis = new FileInputStream(propertiesFile);
+            properties.load(fis);
+            
+            // Get Excel filename from properties
+            String excelFileName = properties.getProperty("excel.filename");
+            if (excelFileName == null || excelFileName.trim().isEmpty()) {
+                System.err.println("Excel filename not specified in config.properties. Please add 'excel.filename=yourfile.xlsm'");
+                return;
+            }
+            
+            String excelFilePath = projectRoot + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + excelFileName;
+            
+            // Create timestamp for filename
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+            String timestamp = dateFormat.format(new Date());
+            String outputFilePath = outputFolderPath + File.separator + excelFileName.replace(".xlsm", "") + "_" + timestamp + ".xlsm";
+
+            System.out.println("Starting Excel replacement process...");
+            System.out.println("Properties file path: " + propertiesPath);
+            System.out.println("Excel file path: " + excelFilePath);
+            System.out.println("Output folder path: " + outputFolderPath);
+            System.out.println("Output file will be saved as: " + new File(outputFilePath).getName());
+
             // Create output folder if it doesn't exist
             File outputFolder = new File(outputFolderPath);
             if (!outputFolder.exists()) {
@@ -46,17 +65,7 @@ public class ExcelReplacer {
                 }
             }
 
-            // Load properties file
-            Properties properties = new Properties();
-            File propertiesFile = new File(propertiesPath);
-            if (!propertiesFile.exists()) {
-                System.err.println("Properties file not found at: " + propertiesPath);
-                return;
-            }
-            System.out.println("Loading properties file...");
-            fis = new FileInputStream(propertiesFile);
-            properties.load(fis);
-            System.out.println("Properties loaded successfully. Found " + properties.size() + " properties.");
+            System.out.println("Properties loaded successfully. Found " + (properties.size() - 1) + " replacement properties.");
 
             // Load Excel file
             File excelFile = new File(excelFilePath);
@@ -86,6 +95,9 @@ public class ExcelReplacer {
                             
                             // Replace placeholders with property values
                             for (String key : properties.stringPropertyNames()) {
+                                // Skip the excel.filename property
+                                if (key.equals("excel.filename")) continue;
+                                
                                 String placeholder = "{" + key + "}";
                                 String oldValue = cellValue;
                                 cellValue = cellValue.replace(placeholder, properties.getProperty(key));
