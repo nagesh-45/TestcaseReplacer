@@ -8,7 +8,10 @@ set "OUTPUT_DIR=%PROJECT_ROOT%Output"
 set "JAR_FILE=%PROJECT_ROOT%target\testcasereplacer-1.0-SNAPSHOT.jar"
 
 :: Create output directory if it doesn't exist
-if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
+if not exist "%OUTPUT_DIR%" (
+    echo Creating output directory: %OUTPUT_DIR%
+    mkdir "%OUTPUT_DIR%"
+)
 
 :: Check for required files
 if not exist "%FILES_DIR%" (
@@ -85,12 +88,13 @@ set "timestamp=%dt:~0,8%_%dt:~8,6%"
 
 :: Get base name of Excel file for output
 for %%i in ("%EXCEL_FOUND%") do set "base_name=%%~ni"
+set "OUTPUT_FILE=%OUTPUT_DIR%\%base_name%_%timestamp%.xlsm"
 
 :: Run Java program to replace values
 echo Running Excel Replacer...
 echo Input Excel: %EXCEL_FOUND%
 echo Config File: %CONFIG_FOUND%
-echo Output File: %OUTPUT_DIR%\%base_name%_%timestamp%.xlsm
+echo Output File: %OUTPUT_FILE%
 echo.
 
 :: Ensure files are not in use
@@ -109,7 +113,7 @@ copy "%EXCEL_FOUND%" "%TEMP_DIR%\input.xlsm" >nul
 copy "%CONFIG_FOUND%" "%TEMP_DIR%\config.properties" >nul
 
 :: Run Java program with temporary files
-java -jar "%JAR_FILE%" "%TEMP_DIR%\input.xlsm" "%TEMP_DIR%\config.properties" "%OUTPUT_DIR%\%base_name%_%timestamp%.xlsm"
+java -jar "%JAR_FILE%" "%TEMP_DIR%\input.xlsm" "%TEMP_DIR%\config.properties" "%OUTPUT_FILE%"
 
 :: Clean up temporary files
 del "%TEMP_DIR%\input.xlsm"
@@ -126,9 +130,22 @@ if errorlevel 1 (
     exit /b 1
 )
 
+:: Verify output file was created
+if not exist "%OUTPUT_FILE%" (
+    echo ERROR: Output file was not created!
+    echo Expected location: %OUTPUT_FILE%
+    echo Current contents of Output folder:
+    dir "%OUTPUT_DIR%"
+    pause
+    exit /b 1
+)
+
 echo.
 echo SUCCESS: Excel file processed successfully!
 echo Output file: %base_name%_%timestamp%.xlsm
-echo Location: %OUTPUT_DIR%
+echo Exact location: %OUTPUT_FILE%
+echo.
+echo Verifying output file...
+dir "%OUTPUT_FILE%"
 echo.
 pause 
