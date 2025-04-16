@@ -25,25 +25,33 @@ if not exist "%FILES_DIR%" (
     exit /b 1
 )
 
-:: List contents of Files folder
+:: List contents of Files folder with detailed information
 echo Contents of Files folder:
-dir "%FILES_DIR%"
+dir "%FILES_DIR%" /X
 echo.
 
-if not exist "%FILES_DIR%\IDPE Onus Tcs.xlsm" (
+:: Check for Excel file with exact name
+dir "%FILES_DIR%\IDPE Onus Tcs.xlsm" >nul 2>&1
+if errorlevel 1 (
     echo ERROR: Excel file not found!
-    echo Please copy 'IDPE Onus Tcs.xlsm' to: %FILES_DIR%
+    echo Looking for exact name: 'IDPE Onus Tcs.xlsm'
     echo Current files in Files folder:
-    dir "%FILES_DIR%"
+    dir "%FILES_DIR%" /X
+    echo.
+    echo Please make sure the file name matches exactly (including spaces and case)
     pause
     exit /b 1
 )
 
-if not exist "%FILES_DIR%\config.properties" (
+:: Check for config file with exact name
+dir "%FILES_DIR%\config.properties" >nul 2>&1
+if errorlevel 1 (
     echo ERROR: config.properties not found!
-    echo Please copy 'config.properties' to: %FILES_DIR%
+    echo Looking for exact name: 'config.properties'
     echo Current files in Files folder:
-    dir "%FILES_DIR%"
+    dir "%FILES_DIR%" /X
+    echo.
+    echo Please make sure the file name matches exactly
     pause
     exit /b 1
 )
