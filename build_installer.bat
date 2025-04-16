@@ -9,11 +9,11 @@ set "APP_NAME=ExcelReplacer"
 set "APP_VERSION=1.0.0"
 set "VENDOR=YourCompany"
 
-:: Check for Java 14+
-java -version 2>&1 | findstr /i "version" | findstr /i "14" >nul
+:: Check for Java
+java -version >nul 2>&1
 if errorlevel 1 (
-    echo ERROR: Java 14 or later is required for jpackage
-    echo Please install Java 14 or later
+    echo ERROR: Java is not installed or not found in PATH
+    echo Please install Java
     pause
     exit /b 1
 )
