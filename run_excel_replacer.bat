@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 :: Set paths
 set "PROJECT_ROOT=%~dp0"
-set "RESOURCES_DIR=%PROJECT_ROOT%Files"
+set "FILES_DIR=%PROJECT_ROOT%Files"
 set "OUTPUT_DIR=%PROJECT_ROOT%Output"
 set "JAR_FILE=%PROJECT_ROOT%target\testcasereplacer-1.0-SNAPSHOT.jar"
 
@@ -11,14 +11,23 @@ set "JAR_FILE=%PROJECT_ROOT%target\testcasereplacer-1.0-SNAPSHOT.jar"
 if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
 :: Check for required files
-if not exist "%RESOURCES_DIR%\IDPE Onus Tcs.xlsm" (
-    echo ERROR: Excel file not found in Files folder!
+if not exist "%FILES_DIR%" (
+    echo ERROR: Files folder not found!
+    echo Please create a 'Files' folder in: %PROJECT_ROOT%
     pause
     exit /b 1
 )
 
-if not exist "%RESOURCES_DIR%\config.properties" (
-    echo ERROR: config.properties not found in Files folder!
+if not exist "%FILES_DIR%\IDPE Onus Tcs.xlsm" (
+    echo ERROR: Excel file not found!
+    echo Please copy 'IDPE Onus Tcs.xlsm' to: %FILES_DIR%
+    pause
+    exit /b 1
+)
+
+if not exist "%FILES_DIR%\config.properties" (
+    echo ERROR: config.properties not found!
+    echo Please copy 'config.properties' to: %FILES_DIR%
     pause
     exit /b 1
 )
@@ -46,13 +55,19 @@ set "timestamp=%dt:~0,8%_%dt:~8,6%"
 
 :: Run Java program to replace values
 echo Running Excel Replacer...
-java -jar "%JAR_FILE%" "%RESOURCES_DIR%\IDPE Onus Tcs.xlsm" "%RESOURCES_DIR%\config.properties" "%OUTPUT_DIR%\IDPE Onus Tcs_%timestamp%.xlsm"
+echo Input Excel: %FILES_DIR%\IDPE Onus Tcs.xlsm
+echo Config File: %FILES_DIR%\config.properties
+echo Output File: %OUTPUT_DIR%\IDPE Onus Tcs_%timestamp%.xlsm
+echo.
+
+java -jar "%JAR_FILE%" "%FILES_DIR%\IDPE Onus Tcs.xlsm" "%FILES_DIR%\config.properties" "%OUTPUT_DIR%\IDPE Onus Tcs_%timestamp%.xlsm"
 
 if errorlevel 1 (
     echo ERROR: Failed to process Excel file!
     echo Please make sure:
     echo 1. The Excel file is not open in Excel
     echo 2. You have write permissions to this folder
+    echo 3. The config.properties file has the correct format
     pause
     exit /b 1
 )
@@ -60,6 +75,6 @@ if errorlevel 1 (
 echo.
 echo SUCCESS: Excel file processed successfully!
 echo Output file: IDPE Onus Tcs_%timestamp%.xlsm
-echo Location: Output folder
+echo Location: %OUTPUT_DIR%
 echo.
 pause 
