@@ -93,7 +93,28 @@ echo Config File: %CONFIG_FOUND%
 echo Output File: %OUTPUT_DIR%\%base_name%_%timestamp%.xlsm
 echo.
 
-java -jar "%JAR_FILE%" "%EXCEL_FOUND%" "%CONFIG_FOUND%" "%OUTPUT_DIR%\%base_name%_%timestamp%.xlsm"
+:: Ensure files are not in use
+echo Checking if files are in use...
+tasklist /FI "IMAGENAME eq EXCEL.EXE" 2>NUL | find /I /N "EXCEL.EXE">NUL
+if "%ERRORLEVEL%"=="0" (
+    echo ERROR: Excel is running. Please close Excel and try again.
+    pause
+    exit /b 1
+)
+
+:: Copy files to temporary location to avoid path issues
+set "TEMP_DIR=%TEMP%\ExcelReplacer_%RANDOM%"
+mkdir "%TEMP_DIR%"
+copy "%EXCEL_FOUND%" "%TEMP_DIR%\input.xlsm" >nul
+copy "%CONFIG_FOUND%" "%TEMP_DIR%\config.properties" >nul
+
+:: Run Java program with temporary files
+java -jar "%JAR_FILE%" "%TEMP_DIR%\input.xlsm" "%TEMP_DIR%\config.properties" "%OUTPUT_DIR%\%base_name%_%timestamp%.xlsm"
+
+:: Clean up temporary files
+del "%TEMP_DIR%\input.xlsm"
+del "%TEMP_DIR%\config.properties"
+rmdir "%TEMP_DIR%"
 
 if errorlevel 1 (
     echo ERROR: Failed to process Excel file!
