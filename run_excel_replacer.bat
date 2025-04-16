@@ -24,33 +24,33 @@ if not exist "%FILES_DIR%" (
     exit /b 1
 )
 
-:: List all files in the Files directory with 8.3 names
-echo Available files in %FILES_DIR% (with 8.3 names):
+:: List all files in the Files directory
+echo Available files in %FILES_DIR%:
 dir /X "%FILES_DIR%"
 
-:: Check for Excel file
+:: Find Excel file
 set "EXCEL_FILE="
-for %%f in ("%FILES_DIR%\*.xlsm") do (
-    if not defined EXCEL_FILE set "EXCEL_FILE=%%f"
+for /f "tokens=*" %%f in ('dir /b /a-d "%FILES_DIR%\*.xlsm" 2^>nul') do (
+    set "EXCEL_FILE=%FILES_DIR%\%%f"
+    goto :found_excel
 )
+:found_excel
 if not defined EXCEL_FILE (
     echo ERROR: No Excel file (.xlsm) found in %FILES_DIR%
-    echo Looking for files with pattern: *.xlsm
-    dir /X "%FILES_DIR%\*.xlsm" 2>nul
     exit /b 1
 )
 echo Found Excel file: %~nxEXCEL_FILE%
 echo Full path: %EXCEL_FILE%
 
-:: Check for config file
+:: Find config file
 set "CONFIG_FILE="
-for %%f in ("%FILES_DIR%\*.properties") do (
-    if not defined CONFIG_FILE set "CONFIG_FILE=%%f"
+for /f "tokens=*" %%f in ('dir /b /a-d "%FILES_DIR%\*.properties" 2^>nul') do (
+    set "CONFIG_FILE=%FILES_DIR%\%%f"
+    goto :found_config
 )
+:found_config
 if not defined CONFIG_FILE (
     echo ERROR: No config file (.properties) found in %FILES_DIR%
-    echo Looking for files with pattern: *.properties
-    dir /X "%FILES_DIR%\*.properties" 2>nul
     exit /b 1
 )
 echo Found config file: %~nxCONFIG_FILE%
