@@ -1,9 +1,5 @@
 @echo off
-setlocal enabledelayedexpansion
-
-:: Prevent closing on error
-set "errorlevel="
-set "exitcode="
+setlocal
 
 echo Excel Replacer - Build and Run Tool
 echo ==================================
@@ -52,10 +48,8 @@ goto menu
 echo.
 echo Cleaning and rebuilding project...
 call mvn clean install
-set exitcode=%errorlevel%
-if %exitcode% neq 0 (
-    echo Error: Build failed with exit code %exitcode%
-    echo Please check the error messages above
+if errorlevel 1 (
+    echo Error: Build failed
     pause
     goto menu
 )
@@ -69,10 +63,8 @@ if errorlevel 1 goto run
 echo.
 echo Building project...
 call mvn install
-set exitcode=%errorlevel%
-if %exitcode% neq 0 (
-    echo Error: Build failed with exit code %exitcode%
-    echo Please check the error messages above
+if errorlevel 1 (
+    echo Error: Build failed
     pause
     goto menu
 )
@@ -100,13 +92,11 @@ if not exist "src\main\resources\config.properties" (
     goto menu
 )
 
-:: Run the JAR file with error handling
+:: Run the JAR file
 echo Starting Java program...
 java -jar target\testcasereplacer-1.0-SNAPSHOT.jar
-set exitcode=%errorlevel%
-if %exitcode% neq 0 (
-    echo Error: Program exited with code %exitcode%
-    echo Please check the error messages above
+if errorlevel 1 (
+    echo Error: Program failed to run
 ) else (
     echo Execution completed successfully.
 )
