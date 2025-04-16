@@ -112,20 +112,23 @@ mkdir "%TEMP_DIR%"
 copy "%EXCEL_FOUND%" "%TEMP_DIR%\input.xlsm" >nul
 copy "%CONFIG_FOUND%" "%TEMP_DIR%\config.properties" >nul
 
-:: Run Java program with temporary files
-java -jar "%JAR_FILE%" "%TEMP_DIR%\input.xlsm" "%TEMP_DIR%\config.properties" "%OUTPUT_FILE%"
+:: Run Java program with temporary files and capture output
+echo Running Java program...
+java -jar "%JAR_FILE%" "%TEMP_DIR%\input.xlsm" "%TEMP_DIR%\config.properties" "%OUTPUT_FILE%" 2>&1 | tee "%TEMP_DIR%\java_output.txt"
+
+:: Check Java program exit code
+set "JAVA_EXIT_CODE=%ERRORLEVEL%"
+type "%TEMP_DIR%\java_output.txt"
 
 :: Clean up temporary files
 del "%TEMP_DIR%\input.xlsm"
 del "%TEMP_DIR%\config.properties"
+del "%TEMP_DIR%\java_output.txt"
 rmdir "%TEMP_DIR%"
 
-if errorlevel 1 (
-    echo ERROR: Failed to process Excel file!
-    echo Please make sure:
-    echo 1. The Excel file is not open in Excel
-    echo 2. You have write permissions to this folder
-    echo 3. The config.properties file has the correct format
+if %JAVA_EXIT_CODE% neq 0 (
+    echo ERROR: Java program failed with exit code %JAVA_EXIT_CODE%
+    echo Please check the Java output above for details.
     pause
     exit /b 1
 )
