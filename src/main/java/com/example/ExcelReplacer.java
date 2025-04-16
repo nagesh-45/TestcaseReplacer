@@ -12,7 +12,7 @@ public class ExcelReplacer {
     public static void main(String[] args) {
         // Get the project root directory
         String projectRoot = System.getProperty("user.dir");
-        String propertiesPath = projectRoot + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "config.properties";
+        String propertiesPath = projectRoot + File.separator + "Files" + File.separator + "config.properties";
         String outputFolderPath = projectRoot + File.separator + "output";
         
         FileInputStream fis = null;
@@ -37,7 +37,7 @@ public class ExcelReplacer {
                 return;
             }
             
-            String excelFilePath = projectRoot + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + excelFileName;
+            String excelFilePath = projectRoot + File.separator + "Files" + File.separator + excelFileName;
             
             // Create timestamp for filename
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");

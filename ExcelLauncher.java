@@ -58,9 +58,9 @@ public class ExcelLauncher {
             runMavenCommand("install");
         }
 
-        File configFile = new File("src/main/resources/config.properties");
+        File configFile = new File("Files/config.properties");
         if (!configFile.exists()) {
-            throw new Exception("config.properties not found in src/main/resources");
+            throw new Exception("config.properties not found in Files directory");
         }
 
         System.out.println("\nStarting Excel Replacer...");
