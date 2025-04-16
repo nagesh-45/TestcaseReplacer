@@ -18,6 +18,16 @@ if errorlevel 1 (
     exit /b 1
 )
 
+:: Check for jpackage
+jpackage --version >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: jpackage not found
+    echo Please make sure you have the full JDK installed, not just JRE
+    echo You can download it from: https://adoptium.net/
+    pause
+    exit /b 1
+)
+
 :: Check for JAR file
 if not exist "%JAR_FILE%" (
     echo ERROR: JAR file not found!
@@ -50,6 +60,7 @@ jpackage ^
 
 if errorlevel 1 (
     echo ERROR: Failed to create installer
+    echo Please check if you have the full JDK installed
     pause
     exit /b 1
 )

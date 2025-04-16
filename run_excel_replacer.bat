@@ -70,20 +70,17 @@ if not defined CONFIG_FOUND (
 :: Check for Java
 java -version >nul 2>&1
 if errorlevel 1 (
-    echo ERROR: Java is not installed!
-    echo Please install Java 8 or later from: https://www.java.com/download/
-    echo Press any key to exit...
-    pause >nul
+    echo ERROR: Java is not installed or not found in PATH
+    echo Please install Java
+    pause
     exit /b 1
 )
 
 :: Check for JAR file
 if not exist "%JAR_FILE%" (
-    echo ERROR: Java program not found!
-    echo Please make sure the JAR file exists at: %JAR_FILE%
-    dir "%PROJECT_ROOT%target"
-    echo Press any key to exit...
-    pause >nul
+    echo ERROR: JAR file not found!
+    echo Please build the project first: mvn clean package
+    pause
     exit /b 1
 )
 
