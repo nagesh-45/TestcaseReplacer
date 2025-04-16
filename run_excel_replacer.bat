@@ -18,7 +18,8 @@ if not exist "%FILES_DIR%" (
     echo ERROR: Files folder not found!
     echo Please create a 'Files' folder in: %PROJECT_ROOT%
     dir "%PROJECT_ROOT%"
-    pause
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -47,7 +48,8 @@ if not defined EXCEL_FOUND (
 :found_excel
 if not defined EXCEL_FOUND (
     echo ERROR: No Excel file found!
-    pause
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -60,7 +62,8 @@ for %%f in ("%FILES_DIR%\*.properties") do (
 
 if not defined CONFIG_FOUND (
     echo ERROR: No config file found!
-    pause
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -69,7 +72,8 @@ java -version >nul 2>&1
 if errorlevel 1 (
     echo ERROR: Java is not installed!
     echo Please install Java 8 or later from: https://www.java.com/download/
-    pause
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -78,7 +82,8 @@ if not exist "%JAR_FILE%" (
     echo ERROR: Java program not found!
     echo Please make sure the JAR file exists at: %JAR_FILE%
     dir "%PROJECT_ROOT%target"
-    pause
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -102,7 +107,8 @@ echo Checking if files are in use...
 tasklist /FI "IMAGENAME eq EXCEL.EXE" 2>NUL | find /I /N "EXCEL.EXE">NUL
 if "%ERRORLEVEL%"=="0" (
     echo ERROR: Excel is running. Please close Excel and try again.
-    pause
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -118,7 +124,12 @@ java -jar "%JAR_FILE%" "%TEMP_DIR%\input.xlsm" "%TEMP_DIR%\config.properties" "%
 
 :: Check Java program exit code
 set "JAVA_EXIT_CODE=%ERRORLEVEL%"
+echo.
+echo Java program output:
+echo -------------------
 type "%TEMP_DIR%\java_output.txt"
+echo -------------------
+echo.
 
 :: Clean up temporary files
 del "%TEMP_DIR%\input.xlsm"
@@ -129,7 +140,8 @@ rmdir "%TEMP_DIR%"
 if %JAVA_EXIT_CODE% neq 0 (
     echo ERROR: Java program failed with exit code %JAVA_EXIT_CODE%
     echo Please check the Java output above for details.
-    pause
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -139,7 +151,8 @@ if not exist "%OUTPUT_FILE%" (
     echo Expected location: %OUTPUT_FILE%
     echo Current contents of Output folder:
     dir "%OUTPUT_DIR%"
-    pause
+    echo Press any key to exit...
+    pause >nul
     exit /b 1
 )
 
@@ -151,4 +164,5 @@ echo.
 echo Verifying output file...
 dir "%OUTPUT_FILE%"
 echo.
-pause 
+echo Press any key to exit...
+pause >nul 
