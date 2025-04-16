@@ -7,6 +7,12 @@ set "FILES_DIR=%PROJECT_ROOT%Files"
 set "OUTPUT_DIR=%PROJECT_ROOT%Output"
 set "JAR_FILE=%PROJECT_ROOT%target\testcasereplacer-1.0-SNAPSHOT.jar"
 
+:: Debug information
+echo Current directory: %CD%
+echo Project root: %PROJECT_ROOT%
+echo Files directory: %FILES_DIR%
+echo.
+
 :: Create output directory if it doesn't exist
 if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
@@ -14,13 +20,21 @@ if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 if not exist "%FILES_DIR%" (
     echo ERROR: Files folder not found!
     echo Please create a 'Files' folder in: %PROJECT_ROOT%
+    dir "%PROJECT_ROOT%"
     pause
     exit /b 1
 )
 
+:: List contents of Files folder
+echo Contents of Files folder:
+dir "%FILES_DIR%"
+echo.
+
 if not exist "%FILES_DIR%\IDPE Onus Tcs.xlsm" (
     echo ERROR: Excel file not found!
     echo Please copy 'IDPE Onus Tcs.xlsm' to: %FILES_DIR%
+    echo Current files in Files folder:
+    dir "%FILES_DIR%"
     pause
     exit /b 1
 )
@@ -28,6 +42,8 @@ if not exist "%FILES_DIR%\IDPE Onus Tcs.xlsm" (
 if not exist "%FILES_DIR%\config.properties" (
     echo ERROR: config.properties not found!
     echo Please copy 'config.properties' to: %FILES_DIR%
+    echo Current files in Files folder:
+    dir "%FILES_DIR%"
     pause
     exit /b 1
 )
@@ -45,6 +61,7 @@ if errorlevel 1 (
 if not exist "%JAR_FILE%" (
     echo ERROR: Java program not found!
     echo Please make sure the JAR file exists at: %JAR_FILE%
+    dir "%PROJECT_ROOT%target"
     pause
     exit /b 1
 )
