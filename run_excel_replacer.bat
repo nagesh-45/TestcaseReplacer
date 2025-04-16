@@ -1,6 +1,9 @@
 @echo off
-setlocal
+title Excel Replacer
+color 0A
 
+:start
+cls
 echo Excel Replacer - Build and Run Tool
 echo ==================================
 echo.
@@ -11,8 +14,9 @@ java -version >nul 2>&1
 if errorlevel 1 (
     echo Error: Java is not installed or not found in PATH
     echo Please install Java and try again
+    echo.
     pause
-    exit /b 1
+    goto start
 )
 
 :: Check if Maven is installed
@@ -21,8 +25,9 @@ mvn -version >nul 2>&1
 if errorlevel 1 (
     echo Error: Maven is not installed or not found in PATH
     echo Please install Maven and try again
+    echo.
     pause
-    exit /b 1
+    goto start
 )
 
 :menu
@@ -45,14 +50,18 @@ timeout /t 2 >nul
 goto menu
 
 :clean_build
-echo.
+cls
 echo Cleaning and rebuilding project...
+echo.
 call mvn clean install
 if errorlevel 1 (
+    echo.
     echo Error: Build failed
+    echo.
     pause
     goto menu
 )
+echo.
 echo Build successful!
 echo.
 choice /c YN /m "Do you want to run the program now?"
@@ -60,14 +69,18 @@ if errorlevel 2 goto menu
 if errorlevel 1 goto run
 
 :build
-echo.
+cls
 echo Building project...
+echo.
 call mvn install
 if errorlevel 1 (
+    echo.
     echo Error: Build failed
+    echo.
     pause
     goto menu
 )
+echo.
 echo Build successful!
 echo.
 choice /c YN /m "Do you want to run the program now?"
@@ -75,37 +88,43 @@ if errorlevel 2 goto menu
 if errorlevel 1 goto run
 
 :run
-echo.
+cls
 echo Running Excel Replacer...
 echo.
 
 if not exist "target\testcasereplacer-1.0-SNAPSHOT.jar" (
     echo Error: JAR file not found. Building project first...
+    echo.
+    pause
     goto build
 )
 
-:: Check if resources exist
 if not exist "src\main\resources\config.properties" (
     echo Error: config.properties not found in src\main\resources
     echo Please ensure all required files are in place
+    echo.
     pause
     goto menu
 )
 
-:: Run the JAR file
 echo Starting Java program...
+echo.
 java -jar target\testcasereplacer-1.0-SNAPSHOT.jar
 if errorlevel 1 (
+    echo.
     echo Error: Program failed to run
 ) else (
+    echo.
     echo Execution completed successfully.
 )
 echo.
-pause
+echo Press any key to return to menu...
+pause >nul
 goto menu
 
 :end
-echo.
+cls
 echo Thank you for using Excel Replacer!
-timeout /t 2 >nul
+echo.
+timeout /t 3 >nul
 exit /b 0 
