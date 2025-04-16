@@ -28,14 +28,10 @@ if not exist "%FILES_DIR%" (
 echo Available files in %FILES_DIR% (with 8.3 names):
 dir /X "%FILES_DIR%"
 
-:: Check for Excel file (case-insensitive and 8.3 name aware)
+:: Check for Excel file
 set "EXCEL_FILE="
-set "EXCEL_SHORT="
-for /r "%FILES_DIR%" %%f in (*.xlsm) do (
-    if not defined EXCEL_FILE (
-        set "EXCEL_FILE=%%f"
-        set "EXCEL_SHORT=%%~sf"
-    )
+for %%f in ("%FILES_DIR%\*.xlsm") do (
+    if not defined EXCEL_FILE set "EXCEL_FILE=%%f"
 )
 if not defined EXCEL_FILE (
     echo ERROR: No Excel file (.xlsm) found in %FILES_DIR%
@@ -45,16 +41,11 @@ if not defined EXCEL_FILE (
 )
 echo Found Excel file: %~nxEXCEL_FILE%
 echo Full path: %EXCEL_FILE%
-echo 8.3 name: %EXCEL_SHORT%
 
-:: Check for config file (case-insensitive and 8.3 name aware)
+:: Check for config file
 set "CONFIG_FILE="
-set "CONFIG_SHORT="
-for /r "%FILES_DIR%" %%f in (*.properties) do (
-    if not defined CONFIG_FILE (
-        set "CONFIG_FILE=%%f"
-        set "CONFIG_SHORT=%%~sf"
-    )
+for %%f in ("%FILES_DIR%\*.properties") do (
+    if not defined CONFIG_FILE set "CONFIG_FILE=%%f"
 )
 if not defined CONFIG_FILE (
     echo ERROR: No config file (.properties) found in %FILES_DIR%
@@ -64,7 +55,6 @@ if not defined CONFIG_FILE (
 )
 echo Found config file: %~nxCONFIG_FILE%
 echo Full path: %CONFIG_FILE%
-echo 8.3 name: %CONFIG_SHORT%
 
 :: Check for Java
 where java >nul 2>&1
@@ -105,30 +95,20 @@ set "TEMP_DIR=%TEMP%\excel_replacer_%RANDOM%"
 mkdir "%TEMP_DIR%"
 echo Created temporary directory: %TEMP_DIR%
 
-:: Copy files to temporary directory using 8.3 names
+:: Copy files to temporary directory
 echo Copying files to temporary directory...
 copy "%EXCEL_FILE%" "%TEMP_DIR%\input.xlsm" >nul
 if %ERRORLEVEL% neq 0 (
     echo ERROR: Failed to copy Excel file
-    echo Trying with 8.3 name...
-    copy "%EXCEL_SHORT%" "%TEMP_DIR%\input.xlsm" >nul
-    if %ERRORLEVEL% neq 0 (
-        echo ERROR: Failed to copy Excel file even with 8.3 name
-        rmdir /s /q "%TEMP_DIR%"
-        exit /b 1
-    )
+    rmdir /s /q "%TEMP_DIR%"
+    exit /b 1
 )
 
 copy "%CONFIG_FILE%" "%TEMP_DIR%\config.properties" >nul
 if %ERRORLEVEL% neq 0 (
     echo ERROR: Failed to copy config file
-    echo Trying with 8.3 name...
-    copy "%CONFIG_SHORT%" "%TEMP_DIR%\config.properties" >nul
-    if %ERRORLEVEL% neq 0 (
-        echo ERROR: Failed to copy config file even with 8.3 name
-        rmdir /s /q "%TEMP_DIR%"
-        exit /b 1
-    )
+    rmdir /s /q "%TEMP_DIR%"
+    exit /b 1
 )
 
 :: Run Java program
