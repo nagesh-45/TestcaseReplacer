@@ -12,8 +12,23 @@ public class ExcelReplacer {
     public static void main(String[] args) {
         // Get the project root directory
         String projectRoot = System.getProperty("user.dir");
-        String propertiesPath = projectRoot + File.separator + "Files" + File.separator + "config.properties";
-        String outputFolderPath = projectRoot + File.separator + "output";
+        String filesDir = projectRoot + File.separator + "Files";
+        String propertiesPath = filesDir + File.separator + "config.properties";
+        String outputFolderPath = projectRoot + File.separator + "Output";
+        
+        // Check if Files directory exists
+        File filesDirectory = new File(filesDir);
+        if (!filesDirectory.exists()) {
+            System.err.println("ERROR: Files directory not found at: " + filesDir);
+            System.err.println("Please create a 'Files' directory in: " + projectRoot);
+            return;
+        }
+
+        // List contents of Files directory
+        System.out.println("Contents of Files directory:");
+        for (File file : filesDirectory.listFiles()) {
+            System.out.println("  - " + file.getName());
+        }
         
         FileInputStream fis = null;
         FileOutputStream fos = null;
@@ -24,7 +39,8 @@ public class ExcelReplacer {
             Properties properties = new Properties();
             File propertiesFile = new File(propertiesPath);
             if (!propertiesFile.exists()) {
-                System.err.println("Properties file not found at: " + propertiesPath);
+                System.err.println("ERROR: config.properties not found at: " + propertiesPath);
+                System.err.println("Please make sure config.properties exists in the Files directory");
                 return;
             }
             fis = new FileInputStream(propertiesFile);
@@ -33,11 +49,11 @@ public class ExcelReplacer {
             // Get Excel filename from properties
             String excelFileName = properties.getProperty("excel.filename");
             if (excelFileName == null || excelFileName.trim().isEmpty()) {
-                System.err.println("Excel filename not specified in config.properties");
+                System.err.println("ERROR: excel.filename not specified in config.properties");
                 return;
             }
             
-            String excelFilePath = projectRoot + File.separator + "Files" + File.separator + excelFileName;
+            String excelFilePath = filesDir + File.separator + excelFileName;
             
             // Create timestamp for filename
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
@@ -53,7 +69,8 @@ public class ExcelReplacer {
             // Load Excel file
             File excelFile = new File(excelFilePath);
             if (!excelFile.exists()) {
-                System.err.println("Excel file not found at: " + excelFilePath);
+                System.err.println("ERROR: Excel file not found at: " + excelFilePath);
+                System.err.println("Please make sure the file exists in the Files directory");
                 return;
             }
             
