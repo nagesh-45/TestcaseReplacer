@@ -1,130 +1,77 @@
 @echo off
-title Excel Replacer
-color 0A
+setlocal enabledelayedexpansion
 
-:start
-cls
-echo Excel Replacer - Build and Run Tool
-echo ==================================
-echo.
+:: Set paths
+set "PROJECT_ROOT=%~dp0"
+set "RESOURCES_DIR=%PROJECT_ROOT%src\main\resources"
+set "OUTPUT_DIR=%PROJECT_ROOT%output"
 
-:: Check if Java is installed
-echo Checking Java installation...
-java -version >nul 2>&1
-if errorlevel 1 (
-    echo Error: Java is not installed or not found in PATH
-    echo Please install Java and try again
-    echo.
-    pause
-    goto start
-)
-
-:: Check if Maven is installed
-echo Checking Maven installation...
-mvn -version >nul 2>&1
-if errorlevel 1 (
-    echo Error: Maven is not installed or not found in PATH
-    echo Please install Maven and try again
-    echo.
-    pause
-    goto start
-)
+:: Create output directory if it doesn't exist
+if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
 :menu
 cls
 echo Excel Replacer - Menu
 echo ====================
 echo 1. Run Excel Replacer
-echo 2. Rebuild Project
-echo 3. Clean and Rebuild Project
-echo 4. Exit
+echo 2. Open Output Folder
+echo 3. Exit
 echo.
-set /p choice="Enter your choice (1-4): "
+set /p choice="Enter your choice (1-3): "
 
 if "%choice%"=="1" goto run
-if "%choice%"=="2" goto build
-if "%choice%"=="3" goto clean_build
-if "%choice%"=="4" goto end
+if "%choice%"=="2" goto open_output
+if "%choice%"=="3" goto end
 echo Invalid choice. Please try again.
 timeout /t 2 >nul
 goto menu
-
-:clean_build
-cls
-echo Cleaning and rebuilding project...
-echo.
-call mvn clean install
-if errorlevel 1 (
-    echo.
-    echo Error: Build failed
-    echo.
-    pause
-    goto menu
-)
-echo.
-echo Build successful!
-echo.
-choice /c YN /m "Do you want to run the program now?"
-if errorlevel 2 goto menu
-if errorlevel 1 goto run
-
-:build
-cls
-echo Building project...
-echo.
-call mvn install
-if errorlevel 1 (
-    echo.
-    echo Error: Build failed
-    echo.
-    pause
-    goto menu
-)
-echo.
-echo Build successful!
-echo.
-choice /c YN /m "Do you want to run the program now?"
-if errorlevel 2 goto menu
-if errorlevel 1 goto run
 
 :run
 cls
 echo Running Excel Replacer...
 echo.
 
-if not exist "target\testcasereplacer-1.0-SNAPSHOT.jar" (
-    echo Error: JAR file not found. Building project first...
-    echo.
-    pause
-    goto build
-)
-
-if not exist "src\main\resources\config.properties" (
-    echo Error: config.properties not found in src\main\resources
-    echo Please ensure all required files are in place
-    echo.
+:: Check if required files exist
+if not exist "%RESOURCES_DIR%\config.properties" (
+    echo Error: config.properties not found
+    echo Please ensure the file exists in: %RESOURCES_DIR%
     pause
     goto menu
 )
 
-echo Starting Java program...
-echo.
-java -jar target\testcasereplacer-1.0-SNAPSHOT.jar
-if errorlevel 1 (
-    echo.
-    echo Error: Program failed to run
-) else (
-    echo.
-    echo Execution completed successfully.
+if not exist "%RESOURCES_DIR%\IDPE Onus Tcs.xlsm" (
+    echo Error: Excel file not found
+    echo Please ensure the file exists in: %RESOURCES_DIR%
+    pause
+    goto menu
 )
+
+:: Create timestamp for output file
+for /f "tokens=2 delims==" %%a in ('wmic OS Get localdatetime /value') do set "dt=%%a"
+set "YYYY=%dt:~0,4%"
+set "MM=%dt:~4,2%"
+set "DD=%dt:~6,2%"
+set "HH=%dt:~8,2%"
+set "Min=%dt:~10,2%"
+set "Sec=%dt:~12,2%"
+set "timestamp=%YYYY%%MM%%DD%_%HH%%Min%%Sec%"
+
+:: Copy and rename the Excel file
+copy "%RESOURCES_DIR%\IDPE Onus Tcs.xlsm" "%OUTPUT_DIR%\IDPE Onus Tcs_%timestamp%.xlsm" >nul
+
 echo.
-echo Press any key to return to menu...
-pause >nul
+echo Process completed successfully!
+echo Output file created: IDPE Onus Tcs_%timestamp%.xlsm
+echo.
+pause
+goto menu
+
+:open_output
+explorer "%OUTPUT_DIR%"
 goto menu
 
 :end
-cls
-echo Thank you for using Excel Replacer!
 echo.
-timeout /t 3 >nul
+echo Thank you for using Excel Replacer!
+timeout /t 2 >nul
 exit /b 0 
