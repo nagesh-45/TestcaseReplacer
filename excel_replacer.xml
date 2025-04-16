@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>console</headerType>
+  <jar>target/testcasereplacer-1.0-SNAPSHOT.jar</jar>
+  <outfile>ExcelReplacer.exe</outfile>
+  <errTitle>Excel Replacer</errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>true</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon></icon>
+  <jre>
+    <path>jre</path>
+    <bundledJre64Bit>true</bundledJre64Bit>
+    <bundledJreAsFallback>true</bundledJreAsFallback>
+    <minVersion>1.8.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+    <initialHeapSize>128</initialHeapSize>
+    <maxHeapSize>512</maxHeapSize>
+  </jre>
+  <versionInfo>
+    <fileVersion>1.0.0.0</fileVersion>
+    <txtFileVersion>1.0.0.0</txtFileVersion>
+    <fileDescription>Excel Replacer</fileDescription>
+    <copyright>Copyright (c) 2024</copyright>
+    <productVersion>1.0.0.0</productVersion>
+    <txtProductVersion>1.0.0.0</txtProductVersion>
+    <productName>Excel Replacer</productName>
+    <companyName>Your Company</companyName>
+    <internalName>ExcelReplacer</internalName>
+    <originalFilename>ExcelReplacer.exe</originalFilename>
+  </versionInfo>
+  <messages>
+    <startupErr>Java Runtime Environment not found. Please reinstall the application.</startupErr>
+    <bundledJreErr>Failed to load JRE. Please reinstall the application.</bundledJreErr>
+    <jreVersionErr>This application requires Java 1.8 or later. Please reinstall the application.</jreVersionErr>
+    <launcherErr>Failed to launch the application. Please reinstall the application.</launcherErr>
+  </messages>
+</launch4jConfig> 
