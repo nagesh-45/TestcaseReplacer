@@ -3,15 +3,16 @@ setlocal enabledelayedexpansion
 
 :: Set paths
 set "PROJECT_ROOT=%~dp0"
+set "FILES_DIR=%PROJECT_ROOT%Files"
 set "DIST_DIR=%PROJECT_ROOT%dist"
-set "FILES_DIR=%DIST_DIR%\Files"
+set "DIST_FILES_DIR=%DIST_DIR%\Files"
 set "TARGET_DIR=%DIST_DIR%\target"
 set "OUTPUT_DIR=%DIST_DIR%\Output"
 
 :: Create distribution directory structure
 if exist "%DIST_DIR%" rmdir /s /q "%DIST_DIR%"
 mkdir "%DIST_DIR%"
-mkdir "%FILES_DIR%"
+mkdir "%DIST_FILES_DIR%"
 mkdir "%TARGET_DIR%"
 mkdir "%OUTPUT_DIR%"
 
@@ -19,8 +20,8 @@ mkdir "%OUTPUT_DIR%"
 echo Copying files...
 copy "%PROJECT_ROOT%run_excel_replacer.bat" "%DIST_DIR%"
 copy "%PROJECT_ROOT%target\testcasereplacer-1.0-SNAPSHOT.jar" "%TARGET_DIR%"
-copy "%PROJECT_ROOT%Files\IDPE Onus Tcs.xlsm" "%FILES_DIR%"
-copy "%PROJECT_ROOT%Files\config.properties" "%FILES_DIR%"
+copy "%FILES_DIR%\IDPE Onus Tcs.xlsm" "%DIST_FILES_DIR%"
+copy "%FILES_DIR%\config.properties" "%DIST_FILES_DIR%"
 
 :: Create README
 echo Creating README...
