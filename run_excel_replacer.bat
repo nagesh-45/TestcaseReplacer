@@ -30,28 +30,31 @@ echo Contents of Files folder:
 dir "%FILES_DIR%" /X
 echo.
 
-:: Check for Excel file with exact name
-dir "%FILES_DIR%\IDPE Onus Tcs.xlsm" >nul 2>&1
-if errorlevel 1 (
-    echo ERROR: Excel file not found!
-    echo Looking for exact name: 'IDPE Onus Tcs.xlsm'
+:: Find files using 8.3 names
+set "CONFIG_FOUND="
+set "EXCEL_FOUND="
+
+for %%f in ("%FILES_DIR%\*.*") do (
+    if /i "%%~snxf"=="CONFIG~.PRO" set "CONFIG_FOUND=%%f"
+    if /i "%%~snxf"=="IDPEON~1.XLS" set "EXCEL_FOUND=%%f"
+)
+
+if not defined CONFIG_FOUND (
+    echo ERROR: config.properties not found!
+    echo Looking for file with 8.3 name: CONFIG~.PRO
     echo Current files in Files folder:
     dir "%FILES_DIR%" /X
     echo.
-    echo Please make sure the file name matches exactly (including spaces and case)
     pause
     exit /b 1
 )
 
-:: Check for config file with exact name
-dir "%FILES_DIR%\config.properties" >nul 2>&1
-if errorlevel 1 (
-    echo ERROR: config.properties not found!
-    echo Looking for exact name: 'config.properties'
+if not defined EXCEL_FOUND (
+    echo ERROR: Excel file not found!
+    echo Looking for file with 8.3 name: IDPEON~1.XLS
     echo Current files in Files folder:
     dir "%FILES_DIR%" /X
     echo.
-    echo Please make sure the file name matches exactly
     pause
     exit /b 1
 )
@@ -80,12 +83,12 @@ set "timestamp=%dt:~0,8%_%dt:~8,6%"
 
 :: Run Java program to replace values
 echo Running Excel Replacer...
-echo Input Excel: %FILES_DIR%\IDPE Onus Tcs.xlsm
-echo Config File: %FILES_DIR%\config.properties
+echo Input Excel: %EXCEL_FOUND%
+echo Config File: %CONFIG_FOUND%
 echo Output File: %OUTPUT_DIR%\IDPE Onus Tcs_%timestamp%.xlsm
 echo.
 
-java -jar "%JAR_FILE%" "%FILES_DIR%\IDPE Onus Tcs.xlsm" "%FILES_DIR%\config.properties" "%OUTPUT_DIR%\IDPE Onus Tcs_%timestamp%.xlsm"
+java -jar "%JAR_FILE%" "%EXCEL_FOUND%" "%CONFIG_FOUND%" "%OUTPUT_DIR%\IDPE Onus Tcs_%timestamp%.xlsm"
 
 if errorlevel 1 (
     echo ERROR: Failed to process Excel file!
