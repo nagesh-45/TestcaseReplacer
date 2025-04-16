@@ -7,12 +7,6 @@ set "FILES_DIR=%PROJECT_ROOT%Files"
 set "OUTPUT_DIR=%PROJECT_ROOT%Output"
 set "JAR_FILE=%PROJECT_ROOT%target\testcasereplacer-1.0-SNAPSHOT.jar"
 
-:: Debug information
-echo Current directory: %CD%
-echo Project root: %PROJECT_ROOT%
-echo Files directory: %FILES_DIR%
-echo.
-
 :: Create output directory if it doesn't exist
 if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
@@ -25,122 +19,46 @@ if not exist "%FILES_DIR%" (
     exit /b 1
 )
 
-:: List contents of Files folder with detailed information
-echo Contents of Files folder:
+:: Show available files
+echo Available files in %FILES_DIR%:
 dir "%FILES_DIR%" /X
 echo.
 
-:menu
-cls
-echo Excel Replacer
-echo ==============
-echo.
-echo 1. Use default files (IDPE Onus Tcs.xlsm and config.properties)
-echo 2. Select different Excel file
-echo 3. Select different config file
-echo 4. Exit
-echo.
-set /p choice="Enter your choice (1-4): "
-
-if "%choice%"=="1" goto default_files
-if "%choice%"=="2" goto select_excel
-if "%choice%"=="3" goto select_config
-if "%choice%"=="4" exit /b 0
-
-echo Invalid choice! Please try again.
-timeout /t 2 >nul
-goto menu
-
-:select_excel
-cls
-echo Available Excel files in %FILES_DIR%:
-echo.
-echo Regular names and 8.3 names:
-echo ---------------------------
-dir "%FILES_DIR%\*.xls*" /X
-echo.
-set /p excel_file="Enter Excel filename (with extension): "
+:: Find Excel file (.xlsm first, then other Excel formats)
 set "EXCEL_FOUND="
+for %%f in ("%FILES_DIR%\*.xlsm") do (
+    echo Found Excel file: %%~nxf (8.3 name: %%~snxf)
+    set "EXCEL_FOUND=%%f"
+    goto :found_excel
+)
 
-:: Try to find file with exact name first
-if exist "%FILES_DIR%\%excel_file%" (
-    set "EXCEL_FOUND=%FILES_DIR%\%excel_file%"
-) else (
-    :: If not found, try to match 8.3 name
-    for %%f in ("%FILES_DIR%\*.*") do (
-        if /i "%%~snxf"=="%excel_file%" set "EXCEL_FOUND=%%f"
+:: If no .xlsm found, try other Excel formats
+if not defined EXCEL_FOUND (
+    for %%f in ("%FILES_DIR%\*.xls*") do (
+        echo Found Excel file: %%~nxf (8.3 name: %%~snxf)
+        set "EXCEL_FOUND=%%f"
+        goto :found_excel
     )
 )
 
+:found_excel
 if not defined EXCEL_FOUND (
-    echo File not found!
-    echo Please check the filename and try again.
-    timeout /t 2 >nul
-    goto select_excel
+    echo ERROR: No Excel file found!
+    pause
+    exit /b 1
 )
-goto check_config
 
-:select_config
-cls
-echo Available config files in %FILES_DIR%:
-echo.
-echo Regular names and 8.3 names:
-echo ---------------------------
-dir "%FILES_DIR%\*.properties" /X
-echo.
-set /p config_file="Enter config filename (with extension): "
+:: Find config file
 set "CONFIG_FOUND="
-
-:: Try to find file with exact name first
-if exist "%FILES_DIR%\%config_file%" (
-    set "CONFIG_FOUND=%FILES_DIR%\%config_file%"
-) else (
-    :: If not found, try to match 8.3 name
-    for %%f in ("%FILES_DIR%\*.*") do (
-        if /i "%%~snxf"=="%config_file%" set "CONFIG_FOUND=%%f"
-    )
+for %%f in ("%FILES_DIR%\*.properties") do (
+    echo Found config file: %%~nxf (8.3 name: %%~snxf)
+    set "CONFIG_FOUND=%%f"
 )
 
 if not defined CONFIG_FOUND (
-    echo File not found!
-    echo Please check the filename and try again.
-    timeout /t 2 >nul
-    goto select_config
-)
-goto check_excel
-
-:default_files
-:: Find files using exact 8.3 names
-set "CONFIG_FOUND="
-set "EXCEL_FOUND="
-
-for %%f in ("%FILES_DIR%\*.*") do (
-    if /i "%%~snxf"=="CONFIG~1.PRO" set "CONFIG_FOUND=%%f"
-    if /i "%%~snxf"=="IDPEON~1.XLS" set "EXCEL_FOUND=%%f"
-)
-
-:check_config
-if not defined CONFIG_FOUND (
-    echo ERROR: config.properties not found!
-    echo Looking for file with 8.3 name: CONFIG~1.PRO
-    echo Current files in Files folder:
-    dir "%FILES_DIR%" /X
-    echo.
-    echo Please select a config file from the menu.
+    echo ERROR: No config file found!
     pause
-    goto menu
-)
-
-:check_excel
-if not defined EXCEL_FOUND (
-    echo ERROR: Excel file not found!
-    echo Looking for file with 8.3 name: IDPEON~1.XLS
-    echo Current files in Files folder:
-    dir "%FILES_DIR%" /X
-    echo.
-    echo Please select an Excel file from the menu.
-    pause
-    goto menu
+    exit /b 1
 )
 
 :: Check for Java
